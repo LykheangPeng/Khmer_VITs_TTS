@@ -6,11 +6,8 @@
 One multi-speaker model, 10 voices, reads Khmer script directly (no phonemizer or G2P needed),
 expands Khmer/Arabic numerals to words, and generates 22.05 kHz audio.
 
-![tests](https://github.com/<your-username>/khmer-vits/actions/workflows/tests.yml/badge.svg)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/code-MIT-green)
-
-> Replace `<your-username>` in the badge link after you push the repository.
 
 ---
 
@@ -70,9 +67,9 @@ produces them, but they are the least reliable voices (see [§7](#7-limitations-
 
 ### Install
 ```bash
-git clone https://github.com/<your-username>/khmer-vits.git
+git clone https://github.com/LykheangPeng/Khmer_VITs_TTS.git
 cd khmer-vits
-pip install -e ".[download,logging]"      # adds the `khmer-vits` command
+pip install -r requirements.txt
 ```
 Install the PyTorch build that matches your CUDA version first if needed (see pytorch.org).
 
