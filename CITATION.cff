@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it, the VITS paper, and the Khmer ASR Cultural Dataset."
+title: "Khmer VITS TTS: end-to-end Khmer text-to-speech trained from scratch"
+type: software
+license: MIT
+repository-code: "https://github.com/<your-username>/khmer-vits"
+authors:
+  - name: "khmer-vits-tts contributors"
+references:
+  - type: conference-paper
+    title: "Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech"
+    authors:
+      - family-names: Kim
+        given-names: Jaehyeon
+      - family-names: Kong
+        given-names: Jungil
+      - family-names: Son
+        given-names: Juhee
+    collection-title: "Proceedings of the 38th International Conference on Machine Learning (ICML)"
+    year: 2021
+  - type: dataset
+    title: "Khmer ASR Cultural Dataset"
+    authors:
+      - name: "Digital Divide Data"
+    year: 2026
+    url: "https://mozilladatacollective.com/datasets/cmkcy8in2004umo0775mye43g"
+    license: CC-BY-SA-4.0

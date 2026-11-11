@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 PENG LYKHEANG
+Copyright (c) 2026 khmer-vits-tts contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+-------------------------------------------------------------------------------
+Third-party notices
+
+The model code in khmer_vits/models/ is ported from the official VITS implementation:
+  https://github.com/jaywalnut310/vits
+  MIT License, Copyright (c) 2021 Jaehyeon Kim
+
+The rational-quadratic spline transform follows nflows:
+  https://github.com/bayesiains/nflows
+  MIT License, Copyright (c) 2020 Conor Durkan, Artur Bekasov, Iain Murray, George Papamakarios
+
+-------------------------------------------------------------------------------
+Data, trained weights and audio samples (NOT covered by the MIT licence above)
+
+The training data, the Khmer ASR Cultural Dataset by Digital Divide Data, is licensed
+CC-BY-SA-4.0 (https://creativecommons.org/licenses/by-sa/4.0/). It is not included in
+this repository. The audio files in samples/ and any released model weights are derived
+from it and are shared under CC-BY-SA-4.0, with attribution to Digital Divide Data.

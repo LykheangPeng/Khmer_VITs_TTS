@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "khmer-vits-tts"
+version = "1.0.0"
+description = "End-to-end Khmer text-to-speech: VITS trained from scratch on the Khmer ASR Cultural Dataset"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["tts", "text-to-speech", "khmer", "vits", "speech-synthesis", "pytorch"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.1",
+    "numpy",
+    "scipy",
+    "soundfile",
+    "numba",   # fast monotonic alignment search (a numpy fallback exists)
+    "soxr",    # resampling during `prepare` (falls back to scipy)
+]
+
+[project.optional-dependencies]
+download = ["datacollective"]
+logging = ["tensorboard"]
+dev = ["pytest", "librosa", "matplotlib", "pyflakes"]
+all = ["datacollective", "tensorboard", "pytest", "librosa", "matplotlib", "pyflakes"]
+
+[project.scripts]
+khmer-vits = "khmer_vits.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["khmer_vits*"]

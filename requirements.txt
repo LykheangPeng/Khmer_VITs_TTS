@@ -1,0 +1,9 @@
+# Equivalent to `pip install -e ".[download,logging]"`
+torch>=2.1
+numpy
+scipy
+soundfile
+numba
+soxr
+datacollective
+tensorboard
