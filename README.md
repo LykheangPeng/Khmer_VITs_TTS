@@ -8,10 +8,14 @@ expands Khmer/Arabic numerals to words, and generates 22.05 kHz audio.
 
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/code-MIT-green)
+[![model](https://img.shields.io/badge/🤗%20model-khmer__vits__tts__v1-yellow)](https://huggingface.co/Lykheang/khmer_vits_tts_v1)
+
+**🤗 Pretrained model:** https://huggingface.co/Lykheang/khmer_vits_tts_v1
 
 ---
 
 ## Contents
+0. [Quick start: use the pretrained model](#0-quick-start-use-the-pretrained-model)
 1. [Samples](#1-samples)
 2. [Installation and usage](#2-installation-and-usage)
 3. [Model: origin and architecture](#3-model-origin-and-architecture)
@@ -22,6 +26,70 @@ expands Khmer/Arabic numerals to words, and generates 22.05 kHz audio.
 8. [Project structure](#8-project-structure)
 9. [Development](#9-development)
 10. [Licence, attribution and citation](#10-licence-attribution-and-citation)
+
+---
+
+## 0. Quick start: use the pretrained model
+
+No training needed: download the trained model from Hugging Face and generate Khmer speech in a
+minute. A GPU is optional; it also runs on a normal CPU (including free Google Colab).
+
+### Install
+```bash
+pip install git+https://github.com/LykheangPeng/Khmer_VITs_TTS.git huggingface_hub
+```
+In Google Colab, put `!` in front: `!pip install git+https://github.com/LykheangPeng/Khmer_VITs_TTS.git huggingface_hub`.
+If `import khmer_vits` then fails, use **Runtime → Restart session** once.
+
+### Generate speech (Python)
+```python
+from huggingface_hub import hf_hub_download
+from khmer_vits.inference import load_generator, synthesize
+import soundfile as sf
+
+ckpt = hf_hub_download("Lykheang/khmer_vits_tts_v1", "G_latest.pt")   # ~160 MB, downloaded once
+net_g, hp, tok, speakers = load_generator(ckpt)                        # uses the GPU if available
+print(speakers)                                                         # the 10 voice IDs
+
+text = "សួស្តី! ខ្ញុំនិយាយភាសាខ្មែរ។"
+audio = synthesize(net_g, tok, hp, text, speaker=speakers.index("f-adt2-0002"))
+sf.write("hello.wav", audio, hp["sample_rate"])
+```
+In a notebook, play it directly:
+```python
+import IPython.display as ipd
+ipd.display(ipd.Audio(audio, rate=hp["sample_rate"]))
+```
+
+### Every voice at once
+```python
+for name in speakers:
+    audio = synthesize(net_g, tok, hp, text, speaker=speakers.index(name))
+    sf.write(f"{name}.wav", audio, hp["sample_rate"])
+```
+
+### Generate speech (command line)
+```bash
+python -c "from huggingface_hub import hf_hub_download; hf_hub_download('Lykheang/khmer_vits_tts_v1', 'G_latest.pt', local_dir='.')"
+khmer-vits synth --ckpt G_latest.pt --text "សួស្តី! ខ្ញុំនិយាយភាសាខ្មែរ។" --speaker f-adt2-0002 --out hello.wav
+khmer-vits synth --ckpt G_latest.pt --text_file lines.txt --speaker all --out out/tts.wav   # one line per sentence
+```
+
+### Choosing a voice and style
+- **Recommended voices** (most training data): `f-adt1-0002`, `f-adt2-0002` (female), `m-adt1-0002`, `m-adt2-0002` (male).
+- **Speed**: `length_scale=1.2` slower, `0.8` faster.
+- **Expressiveness**: `noise_scale` (default 0.667) changes voice/intonation variation, `noise_scale_w` (default 0.8) changes rhythm variation. Lower values sound flatter and more stable.
+
+```python
+audio = synthesize(net_g, tok, hp, text, speaker=speakers.index("m-adt2-0002"),
+                   noise_scale=0.5, noise_scale_w=0.6, length_scale=1.1)
+```
+
+### Tips
+- Write numbers as digits or words; both work: `១៦` and `16` are read as `ដប់ប្រាំមួយ`.
+- Long paragraphs are fine; they are split at `។ ៕ ? !` automatically.
+- English words (Latin letters) are skipped, and decimals, dates and times are not read correctly yet (see [§7](#7-limitations-and-responsible-use)).
+- Generated speech is synthetic; please label it as such when sharing.
 
 ---
 
@@ -65,11 +133,11 @@ produces them, but they are the least reliable voices (see [§7](#7-limitations-
 - For training: an NVIDIA GPU. bf16 needs Ampere or newer (A100, RTX 30xx/40xx, L4…); older GPUs fall back to fp32 automatically. The reference run used an A100-80GB with batch 32; use `--batch_size 16`–`24` on 16–24 GB cards.
 - Disk: about 26 GB for the download and extraction (both can be deleted after `prepare`), plus 6 GB for the prepared data and about 2.5 GB for checkpoints.
 
-### Install
+### Install (for training)
 ```bash
 git clone https://github.com/LykheangPeng/Khmer_VITs_TTS.git
-cd khmer-vits
-pip install -r requirements.txt
+cd Khmer_VITs_TTS
+pip install -e ".[download,logging]"      # installs the package and the `khmer-vits` command
 ```
 Install the PyTorch build that matches your CUDA version first if needed (see pytorch.org).
 
@@ -131,10 +199,10 @@ Long texts are split at `។ ៕ ? !` and joined with short pauses. See also [`e
 `make tensorboard`, `make samples`, `make test`.
 
 ### Pretrained checkpoint
-The weights are **not stored in git**. `G_latest.pt` (≈160 MB) contains weights, config, vocabulary and
-speaker list. Attach it to a GitHub Release (or the Hugging Face Hub) and link it here:
-`<link to G_latest.pt>`. Because the model is trained on CC-BY-SA-4.0 data, release the weights
-under CC-BY-SA-4.0 too (see [§10](#10-licence-attribution-and-citation)).
+The weights are **not stored in git**. The trained model from the reference run (`G_latest.pt`, ≈160 MB:
+weights, config, vocabulary and speaker list) is on Hugging Face:
+**https://huggingface.co/Lykheang/khmer_vits_tts_v1**, released under **CC-BY-SA-4.0**
+(see [§10](#10-licence-attribution-and-citation)). See [§0](#0-quick-start-use-the-pretrained-model) for how to use it.
 
 ---
 
@@ -322,7 +390,7 @@ steps:
 ## 8. Project structure
 
 ```
-khmer-vits/
+Khmer_VITs_TTS/
 ├── khmer_vits/                    # the Python package
 │   ├── cli.py                     # `khmer-vits download | prepare | train | synth`
 │   ├── config.py                  # VITS base hyper-parameters, JSON overrides
@@ -383,7 +451,7 @@ dataset with the real layout (including bad rows the filters must catch), then r
 
 - **Code**: MIT ([LICENSE](LICENSE)). The code in `khmer_vits/models/` is ported from the official VITS implementation (MIT, © 2021 Jaehyeon Kim); the spline transform follows *nflows* (MIT).
 - **Dataset**: Khmer ASR Cultural Dataset by **Digital Divide Data**, CC-BY-SA-4.0. It is not redistributed here; download it from Mozilla Data Collective.
-- **Trained weights and audio samples** (`samples/`, any released checkpoint): derived from the dataset and shared under **CC-BY-SA-4.0** with attribution to Digital Divide Data.
+- **Trained weights and audio samples** (`samples/`, [the Hugging Face model](https://huggingface.co/Lykheang/khmer_vits_tts_v1)): derived from the dataset and shared under **CC-BY-SA-4.0** with attribution to Digital Divide Data.
 
 If you use this work, please cite VITS and credit the dataset:
 
